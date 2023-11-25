@@ -22,6 +22,24 @@ export class RestAPIStack extends cdk.Stack {
     });
 
 
+    // Lambda Functions
+    const getAllMovieReviewsFn = new lambdanode.NodejsFunction(
+      this,
+      "GetAllMovieReviewsFn",
+      {
+        architecture: lambda.Architecture.ARM_64,
+        runtime: lambda.Runtime.NODEJS_16_X,
+        entry: `${__dirname}/../lambdas/getAllMovieReviews.ts`,
+        timeout: cdk.Duration.seconds(10),
+        memorySize: 128,
+        environment: {
+          TABLE_NAME: movieReviewsTable.tableName,
+          REGION: 'eu-west-1',
+        },
+      }
+      );
+
+
     new custom.AwsCustomResource(this, "moviesddbInitData", {
       onCreate: {
         service: "DynamoDB",
@@ -37,6 +55,32 @@ export class RestAPIStack extends cdk.Stack {
         resources: [movieReviewsTable.tableArn],  
       }),
     });
+
+
+    // Permissions 
+    movieReviewsTable.grantReadData(getAllMovieReviewsFn)
+
+
+    // REST API 
+const api = new apig.RestApi(this, "RestAPI", {
+  description: "Moview Reviews API",
+  deployOptions: {
+    stageName: "dev",
+  },
+  // 👇 enable CORS
+  defaultCorsPreflightOptions: {
+    allowHeaders: ["Content-Type", "X-Amz-Date"],
+    allowMethods: ["OPTIONS", "GET", "POST", "PUT", "PATCH", "DELETE"],
+    allowCredentials: true,
+    allowOrigins: ["*"],
+  },
+});
+
+const moviesEndpoint = api.root.addResource("movie-reviews");
+moviesEndpoint.addMethod(
+  "GET",
+  new apig.LambdaIntegration(getAllMovieReviewsFn, { proxy: true })
+);
 
 
       }

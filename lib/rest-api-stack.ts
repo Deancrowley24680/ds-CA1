@@ -116,6 +116,24 @@ export class RestAPIStack extends cdk.Stack {
               }
               );
 
+              // const getMovieReviewsByYearFn = new lambdanode.NodejsFunction(
+              //   this,
+              //   "GetMovieReviewsByYearFn",
+              //   {
+              //     architecture: lambda.Architecture.ARM_64,
+              //     runtime: lambda.Runtime.NODEJS_16_X,
+              //     entry: `${__dirname}/../lambdas/getMovieReviewsByYear.ts`,
+              //     timeout: cdk.Duration.seconds(10),
+              //     memorySize: 128,
+              //     environment: {
+              //       TABLE_NAME: movieReviewsTable.tableName,
+              //       REGION: 'eu-west-1',
+              //     },
+              //   }
+              //   );
+
+            
+
 
     new custom.AwsCustomResource(this, "moviesddbInitData", {
       onCreate: {
@@ -139,6 +157,7 @@ export class RestAPIStack extends cdk.Stack {
     movieReviewsTable.grantReadData(getMovieReviewsByIdFn)
     movieReviewsTable.grantReadData(getMovieReviewsByReviewNameFn)
     movieReviewsTable.grantReadData(getAllMovieReviewsByReviewNameFn)
+    //movieReviewsTable.grantReadData(getMovieReviewsByYearFn)
     movieReviewsTable.grantWriteData(newMovieReviewsFn)
     movieReviewsTable.grantWriteData(updateMovieReviewFn)
 
@@ -193,6 +212,14 @@ updateReviewResource.addMethod(
   "PUT",
   new apig.LambdaIntegration(updateMovieReviewFn, { proxy: true })
 );
+
+// const reviewsYearResource = movieReviewsIdEndpoint.addResource("{year}");
+
+// reviewsYearResource.addMethod(
+//   "GET",
+//   new apig.LambdaIntegration(getMovieReviewsByYearFn, { proxy: true })
+// );
+
 
 
 

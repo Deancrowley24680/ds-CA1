@@ -3,6 +3,7 @@ export type MovieReview = {
   reviewerName: string;  
   reviewDate: string;   
   content: string;       
+  rating: number;
 };
 
 

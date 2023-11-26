@@ -1,25 +1,22 @@
-import {MovieReview} from '../shared/types'
+import { MovieReview } from '../shared/types'
 
-export const movieReviews : MovieReview[] = [
+export const movieReviews: MovieReview[] = [
   {
     movieId: 1234,
-    name: "Dean Crowley",
-    review: "This movie was very enjoyable!",
-    rating: 4,
-    date: "22-01-2023",
+    reviewerName: "Dean Crowley", 
+    reviewDate: "22-01-2023",      
+    content: "This movie was very enjoyable!",
   },
   {
     movieId: 2345,
-    name: "John Smith",
-    review: "This movie was not very enjoyable!",
-    rating: 2,
-    date: "23-02-2023",
+    reviewerName: "John Smith", 
+    reviewDate: "23-02-2023",     
+    content: "This movie was not very enjoyable!", 
   },
   {
     movieId: 3456,
-    name: "Mary Murphy",
-    review: "This movie was okay.",
-    rating: 3,
-    date: "2-04-2023",
+    reviewerName: "Mary Murphy",   
+    reviewDate: "02-04-2023",       
+    content: "This movie was okay.",
   }
 ];

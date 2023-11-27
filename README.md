@@ -15,4 +15,4 @@ This repository contains the implementation of a serverless REST API for the AWS
 + GET /movies/reviews/{reviewerName} - Get all the reviews written by a specific reviewer.
 
 
-![Alt text](image.png)
+![Alt text](image-1.png)

@@ -13,7 +13,7 @@ export class RestAPIStack extends cdk.Stack {
     super(scope, id, props);
 
 
-    // Tables 
+    // Table
     const movieReviewsTable = new dynamodb.Table(this, "MovieReviewsTable", {
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
       partitionKey: { name: "movieId", type: dynamodb.AttributeType.NUMBER },
@@ -199,16 +199,14 @@ movieReviewsIdEndpoint.addMethod(
   new apig.LambdaIntegration(getMovieReviewsByIdFn, { proxy: true })
 );
 
-const allReviewsByReviewerNameResource = movieReviewsEndpoint.addResource("{reviewerName}");
+const allReviewsByReviewerNameResource = movieReviewsIdEndpoint.addResource("{reviewerName}");
 
 allReviewsByReviewerNameResource.addMethod(
   "GET",
   new apig.LambdaIntegration(getAllMovieReviewsByReviewNameFn, { proxy: true })
 );
 
-const updateReviewResource = movieReviewsIdEndpoint.addResource("{reviewerName}");
-
-updateReviewResource.addMethod(
+allReviewsByReviewerNameResource.addMethod(
   "PUT",
   new apig.LambdaIntegration(updateMovieReviewFn, { proxy: true })
 );

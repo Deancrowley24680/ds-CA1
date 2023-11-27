@@ -1,14 +1,15 @@
 import { APIGatewayProxyHandlerV2 } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import { MovieReview } from "../shared/types.d";
 
 const ddbDocClient = createDDbDocClient();
 
 export const handler: APIGatewayProxyHandlerV2 = async (event, context) => { // Note change
   try {
     console.log("Event: ", event);
-    const parameters = event?.pathParameters;
-    const movieId = parameters?.movieId ? parseInt(parameters.movieId) : undefined;
+    const movieId = event?.pathParameters?.movieId ? parseInt(event.pathParameters.movieId) : undefined;
+    const minRating = event?.queryStringParameters?.minRating ? parseInt(event.queryStringParameters.minRating) : undefined;
 
 
     if (!movieId) {
@@ -29,19 +30,13 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => { // 
       })
     );
 
-    console.log("GetCommand response: ", commandOutput);
-    if (!commandOutput.Items) {
-      return {
-        statusCode: 404,
-        headers: {
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({ Message: "Invalid movie Id" }),
-      };
-    }
-    const body = {
-      data: commandOutput.Items,
-    };
+    console.log("QueryCommand response: ", commandOutput);
+    
+    let reviews: MovieReview[] = commandOutput.Items as MovieReview[];
+
+    if (minRating && !isNaN(minRating)) {
+        reviews = reviews.filter((review) => review.rating >= minRating);
+      }
 
     // Return Response
     return {
@@ -49,16 +44,16 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => { // 
       headers: {
         "content-type": "application/json",
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify({ reviews }),
     };
   } catch (error: any) {
-    console.log(JSON.stringify(error));
+    console.error("Error: ", error);
     return {
       statusCode: 500,
       headers: {
         "content-type": "application/json",
       },
-      body: JSON.stringify({ error }),
+      body: JSON.stringify({ error: error.message }),
     };
   }
 };

@@ -7,7 +7,7 @@ const ddbDocClient = createDDbDocClient();
 export const handler: APIGatewayProxyHandlerV2 = async (event, context) => { 
   try {
     console.log("Event: ", event);
-    const reviewerName = event?.pathParameters?.reviewerName;
+    const reviewerName = event?.pathParameters?.allReviewerName;
 
 
     if (!reviewerName) {

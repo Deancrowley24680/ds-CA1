@@ -178,8 +178,9 @@ const api = new apig.RestApi(this, "RestAPI", {
 });
 
 
-const moviesResource = api.root.addResource("movies");
-const movieReviewsEndpoint = moviesResource.addResource("reviews");
+const moviesEndpoint = api.root.addResource("movies");
+const movieReviewsEndpoint = moviesEndpoint.addResource("reviews");
+const reviewerNameEndpoint = movieReviewsEndpoint.addResource("{allReviewerName}");
 
 movieReviewsEndpoint.addMethod(
   "GET",
@@ -191,22 +192,27 @@ movieReviewsEndpoint.addMethod(
   new apig.LambdaIntegration(newMovieReviewsFn, { proxy: true })
 );
 
-const movieIdResource = moviesResource.addResource("{movieId}");
-const movieReviewsIdEndpoint = movieIdResource.addResource("reviews");
+reviewerNameEndpoint.addMethod(
+  "GET",
+  new apig.LambdaIntegration(getAllMovieReviewsByReviewNameFn, { proxy: true })
+);
+
+const movieIdEndpoint = moviesEndpoint.addResource("{movieId}");
+const movieReviewsIdEndpoint = movieIdEndpoint.addResource("reviews");
 
 movieReviewsIdEndpoint.addMethod(
   "GET",
   new apig.LambdaIntegration(getMovieReviewsByIdFn, { proxy: true })
 );
 
-const allReviewsByReviewerNameResource = movieReviewsIdEndpoint.addResource("{reviewerName}");
+const ReviewsByReviewerNameEndpoint = movieReviewsIdEndpoint.addResource("{reviewerName}");
 
-allReviewsByReviewerNameResource.addMethod(
+ReviewsByReviewerNameEndpoint.addMethod(
   "GET",
-  new apig.LambdaIntegration(getAllMovieReviewsByReviewNameFn, { proxy: true })
+  new apig.LambdaIntegration(getMovieReviewsByReviewNameFn, { proxy: true })
 );
 
-allReviewsByReviewerNameResource.addMethod(
+ReviewsByReviewerNameEndpoint.addMethod(
   "PUT",
   new apig.LambdaIntegration(updateMovieReviewFn, { proxy: true })
 );
